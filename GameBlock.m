@@ -1,49 +1,49 @@
 classdef GameBlock < handle
     % GameBlock  Class for drawing the game block
-
+    
     properties (SetAccess = protected)
         Position
         Txt
         Width
         Height
     end
-
+    
     properties (Dependent)
         RectanglePosition
     end
-
+    
     properties (Access = protected)
         hBox
         hText
     end
-
+    
     methods
-
+        
         function obj = GameBlock(x, y, txt, wd, ht, hAx)
-
+            
             if nargin == 0
                 return;
             end
-
+            
             error(nargchk(5, 6, nargin, 'struct'))
-
+            
             if nargin == 5
                 hAx = gca;
             end
-
+            
             validateattributes(x, {'numeric'}, {'vector'}, mfilename, 'X');
             validateattributes(y, {'numeric'}, {'vector', 'size', size(x)}, mfilename, 'Y');
             validateattributes(txt, {'cell'}, {'vector', 'size', size(x)}, mfilename, 'TXT');
             validateattributes(wd, {'numeric'}, {'scalar', 'positive'}, mfilename, 'WD');
             validateattributes(ht, {'numeric'}, {'scalar', 'positive'}, mfilename, 'HT');
             validateattributes(hAx, {'numeric', 'matlab.graphics.axis.Axes'}, {'scalar'}, mfilename, 'HAX');
-
+            
             if ~ishandle(hAx)
                 error('HAX must be a valid handle to an axes');
             end
-
+            
             obj(length(x)) = GameBlock;
-
+            
             for id = 1:length(x)
                 obj(id).Position = [x(id), y(id)];
                 obj(id).Width = wd;
@@ -64,15 +64,15 @@ classdef GameBlock < handle
                     'FontUnits', 'Pixels', ...
                     'FontSize', 48);
             end
-
+            
             updateColors(obj)
-
+            
         end
-
+        
         function val = get.RectanglePosition(obj)
             val = [obj.Position - [obj.Width / 2, obj.Height / 2], obj.Width, obj.Height];
         end
-
+        
         function updateColors(obj)
             txt = get([obj.hText], 'String');
             bgcolors = repmat([237 194 46] / 255, length(obj), 1);
@@ -123,15 +123,15 @@ classdef GameBlock < handle
             ii = ismember(txt, {'131072', '262144', '524288'});
             bgcolors(ii, :) = repmat([237 194 46] / 255, nnz(ii), 1);
             fontsize(ii) = fontsizeTable(6);
-
+            
             set([obj.hBox], {'FaceColor'}, num2cell(bgcolors, 2));
             set([obj.hText], {'Color', 'FontSize'}, ...
                 [num2cell(fgcolors, 2), num2cell(fontsize)]);
-
+            
         end
-
+        
         function set(obj, pos, txt)
-
+            
             if ~isempty(pos) &&~isempty(txt)
                 set([obj.hBox], {'Position'}, ...
                     num2cell([pos' - [[obj.Width] / 2; [obj.Height] / 2]; [obj.Width]; [obj.Height]]', 2))
@@ -147,14 +147,14 @@ classdef GameBlock < handle
             else
                 error('Either POS or TXT must be non-empty');
             end
-
+            
         end
-
+        
         function bringToTop(obj)
             uistack([obj.hBox], 'top');
             uistack([obj.hText], 'top');
         end
-
+        
     end
-
+    
 end
